@@ -1,0 +1,44 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}Edit Note{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center text-primary mb-4">Edit Note</h1>
+
+
+    <div class="card shadow-lg p-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Note Title</label>
+                <input type="text" name="title" class="form-control" value="{{ note.title }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3" required>{{ note.description }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Current File:</label>
+                {% if note.file %}
+                    <p><a href="{{ note.file.url }}" target="_blank">{{ note.file.name }}</a></p>
+                {% else %}
+                    <p>No file uploaded</p>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Upload New File (Optional)</label>
+                <input type="file" name="file" class="form-control">
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+

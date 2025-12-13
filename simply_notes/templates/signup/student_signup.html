@@ -1,0 +1,142 @@
+{% extends 'layout/layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg p-4">
+                <h2 class="text-center mb-4">Student Signup</h2>
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <!-- First Name & Last Name -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="first_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="last_name" required>
+                        </div>
+                    </div>
+
+                    <!-- Roll Number -->
+                    <div class="mb-3">
+                        <label class="form-label">Roll Number</label>
+                        <input type="text" class="form-control" name="roll_number" required>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+
+                    <!-- Password & Confirm Password -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" name="password1" id="password1" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password1', 'togglePassword1')">
+                                    <i id="togglePassword1" class="fa fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" name="password2" id="password2" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password2', 'togglePassword2')">
+                                    <i id="togglePassword2" class="fa fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Select Batch -->
+                    <div class="mb-3">
+                        <label class="form-label">Batch</label>
+                        <select class="form-control" name="batch" id="batchDropdown" required>
+                            <option value="">-- Select Batch --</option>
+                            {% for batch in batches %}
+                                <option value="{{ batch.id }}">{{ batch.year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Select Branch -->
+                    <div class="mb-3">
+                        <label class="form-label">Branch</label>
+                        <select class="form-control" name="branch" id="branchDropdown" required>
+                            <option value="">-- Select Branch --</option>
+                        </select>
+                    </div>
+
+                    <!-- Signup Button -->
+                    <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+
+                    <!-- Display Errors -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger mt-3">
+                        <ul class="mb-0">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+
+<script>
+function togglePassword(inputId, iconId) {
+    var passwordField = document.getElementById(inputId);
+    var toggleIcon = document.getElementById(iconId);
+
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        toggleIcon.classList.remove("fa-eye-slash");
+        toggleIcon.classList.add("fa-eye");
+    } else {
+        passwordField.type = "password";
+        toggleIcon.classList.remove("fa-eye");
+        toggleIcon.classList.add("fa-eye-slash");
+    }
+}
+
+
+$(document).ready(function () {
+    $("#batchDropdown").change(function () {
+        var batch_id = $(this).val();
+        if (batch_id) {
+            $.ajax({
+                url: "{% url 'get_branches' %}",
+                data: { batch_id: batch_id },
+                success: function (data) {
+                    var branchDropdown = $("#branchDropdown");
+                    branchDropdown.empty();
+                    branchDropdown.append('<option value="">-- Select Branch --</option>');
+                    $.each(data.branches, function (index, branch) {
+                        branchDropdown.append('<option value="' + branch.id + '">' + branch.name + '</option>');
+                    });
+                }
+            });
+        } else {
+            $("#branchDropdown").empty().append('<option value="">-- Select Branch --</option>');
+        }
+    });
+});
+</script>
+{% endblock %}

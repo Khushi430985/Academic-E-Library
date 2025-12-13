@@ -1,0 +1,30 @@
+{% extends 'layout/layout.html' %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-2xl font-bold mb-4 text-center">Notes for {{ subject.name }}</h1>
+
+    {% if notes %}
+        <div class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
+            <ul>
+                {% for note in notes %}
+                    <li class="border-b py-2">
+                        <strong>{{ note.title }}</strong> - {{ note.description }}
+                        <a href="{{ note.file.url }}" class="text-blue-500 ml-2" download>Download</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <p class="text-center text-red-500 font-semibold">No notes available for this subject.</p>
+    {% endif %}
+
+    <div class="text-center mt-6">
+        <a href="{% url 'subject_list' subject.semester.id %}" class="text-white bg-blue-500 hover:bg-blue-600 font-bold py-2 px-4 rounded">
+            ← Back to Subjects
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+

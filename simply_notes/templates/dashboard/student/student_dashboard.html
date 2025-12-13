@@ -1,0 +1,138 @@
+{% extends "layout/layout.html" %}
+{% load static %}
+
+{% block Style %}
+<style>
+    .dashboard-container {
+        max-width: 800px;
+        margin: 30px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-container {
+        margin-bottom: 20px;
+    }
+
+    select {
+        width: 100%;
+        padding: 8px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    h3 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .note-card {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn-download {
+        background: #007bff;
+        color: white;
+        padding: 6px 12px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .btn-download:hover {
+        background: #0056b3;
+    }
+</style>
+{% endblock Style %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <!-- Year Selection -->
+    <div class="dropdown-container">
+        <h3>Select Year</h3>
+        <form method="GET" id="yearForm">
+            <select name="year" id="yearDropdown" onchange="this.form.submit();">
+                <option value="">-- Select Year --</option>
+                {% for year in years %}
+                    <option value="{{ year.id }}" {% if selected_year and selected_year == year.id %}selected{% endif %}>
+                        {{ year.get_year_display }} - {{ year.branch.name }} (Batch {{ year.batch.year }})
+                    </option>
+                {% empty %}
+                    <option disabled>No Years Available</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Semester Selection -->
+    {% if selected_year %}
+    <div class="dropdown-container">
+        <h3>Select Semester</h3>
+        <form method="GET" id="semesterForm">
+            <input type="hidden" name="year" value="{{ selected_year }}">
+            <select name="semester" id="semesterDropdown" onchange="this.form.submit();">
+                <option value="">-- Select Semester --</option>
+                {% for semester in semesters %}
+                    <option value="{{ semester.id }}" {% if selected_semester and selected_semester == semester.id %}selected{% endif %}>
+                        Semester {{ semester.sem_number }}
+                    </option>
+                {% empty %}
+                    <option disabled>No Semesters Available</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Subject Selection -->
+    {% if selected_semester %}
+    <div class="dropdown-container">
+        <h3>Select Subject</h3>
+        <form method="GET" id="subjectForm">
+            <input type="hidden" name="year" value="{{ selected_year }}">
+            <input type="hidden" name="semester" value="{{ selected_semester }}">
+            <select name="subject" id="subjectDropdown" onchange="this.form.submit();">
+                <option value="">-- Select Subject --</option>
+                {% for subject in subjects %}
+                    <option value="{{ subject.id }}" {% if selected_subject and selected_subject.id == subject.id %}selected{% endif %}>
+                        {{ subject.name }}
+                    </option>
+                {% empty %}
+                    <option disabled>No Subjects Available</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Available Notes Section -->
+    {% if selected_subject %}
+    <div class="notes-container">
+        <h3>Available Notes for {{ selected_subject.name }}</h3>
+        {% for note in notes %}
+        <div class="note-card">
+            <div>
+                <strong>{{ note.title }}</strong>
+                <p style="margin: 5px 0; font-size: 14px;">{{ note.description }}</p>
+            </div>
+            <a href="{{ note.file.url }}" class="btn-download" download>Download</a>
+        </div>
+        {% empty %}
+            <p>No notes available for this subject.</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock content %}

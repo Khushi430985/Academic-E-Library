@@ -1,0 +1,145 @@
+{% extends "layout/layout.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="text-center">Upload Notes</h2>
+
+    <!-- Batch Selection -->
+    <div class="mb-3">
+        <label class="form-label">Select Batch</label>
+        <form method="GET" id="batchForm">
+            <select class="form-select" name="batch" id="batchDropdown" onchange="this.form.submit();">
+                <option value="">-- Select Batch --</option>
+                {% for batch in batches %}
+                    <option value="{{ batch.id }}" {% if selected_batch == batch.id %}selected{% endif %}>
+                        Batch {{ batch.year }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if selected_batch %}
+    <!-- Branch Selection -->
+    <div class="mb-3">
+        <label class="form-label">Select Branch</label>
+        <form method="GET" id="branchForm">
+            <input type="hidden" name="batch" value="{{ selected_batch }}">
+            <select class="form-select" name="branch" id="branchDropdown" onchange="this.form.submit();">
+                <option value="">-- Select Branch --</option>
+                {% for branch in branches %}
+                    <option value="{{ branch.id }}" {% if selected_branch == branch.id %}selected{% endif %}>
+                        {{ branch.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if selected_branch %}
+    <!-- Year Selection -->
+    <div class="mb-3">
+        <label class="form-label">Select Year</label>
+        <form method="GET" id="yearForm">
+            <input type="hidden" name="batch" value="{{ selected_batch }}">
+            <input type="hidden" name="branch" value="{{ selected_branch }}">
+            <select class="form-select" name="year" id="yearDropdown" onchange="this.form.submit();">
+                <option value="">-- Select Year --</option>
+                {% for year in years %}
+                    <option value="{{ year.id }}" {% if selected_year == year.id %}selected{% endif %}>
+                        Year {{ year.year }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if selected_year %}
+    <!-- Semester Selection -->
+    <div class="mb-3">
+        <label class="form-label">Select Semester</label>
+        <form method="GET" id="semesterForm">
+            <input type="hidden" name="batch" value="{{ selected_batch }}">
+            <input type="hidden" name="branch" value="{{ selected_branch }}">
+            <input type="hidden" name="year" value="{{ selected_year }}">
+            <select class="form-select" name="semester" id="semesterDropdown" onchange="this.form.submit();">
+                <option value="">-- Select Semester --</option>
+                {% for semester in semesters %}
+                    <option value="{{ semester.id }}" {% if selected_semester == semester.id %}selected{% endif %}>
+                        Semester {{ semester.sem_number }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if selected_semester %}
+    <!-- Subject Selection -->
+    <div class="mb-3">
+        <label class="form-label">Select Subject</label>
+        <form method="GET" id="subjectForm">
+            <input type="hidden" name="batch" value="{{ selected_batch }}">
+            <input type="hidden" name="branch" value="{{ selected_branch }}">
+            <input type="hidden" name="year" value="{{ selected_year }}">
+            <input type="hidden" name="semester" value="{{ selected_semester }}">
+            <select class="form-select" name="subject" id="subjectDropdown" onchange="this.form.submit();">
+                <option value="">-- Select Subject --</option>
+                {% for subject in subjects %}
+                    <option value="{{ subject.id }}" {% if selected_subject.id == subject.id %}selected{% endif %}>
+                        {{ subject.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if selected_subject %}
+    <!-- Upload Notes Section -->
+    <div class="card p-4">
+        <h4>Upload Notes</h4>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'upload_notes' %}">
+            {% csrf_token %}
+            <input type="hidden" name="batch" value="{{ selected_batch }}">
+            <input type="hidden" name="branch" value="{{ selected_branch }}">
+            <input type="hidden" name="year" value="{{ selected_year }}">
+            <input type="hidden" name="semester" value="{{ selected_semester }}">
+            <input type="hidden" name="subject" value="{{ selected_subject.id }}">
+            
+            <label class="form-label" for="title">Note Title:</label>
+            <input class="form-control" type="text" name="title" id="title" required>
+
+            <label class="form-label" for="description">Description:</label>
+            <textarea class="form-control" name="description" id="description" required></textarea>
+
+            <label class="form-label" for="file">Upload File:</label>
+            <input class="form-control" type="file" name="file" id="file" required>
+
+            <button class="btn btn-primary mt-3" type="submit">Upload Note</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Uploaded Notes List -->
+    <h3 class="mt-4">Uploaded Notes</h3>
+    {% if notes %}
+    <ul class="list-group">
+        {% for note in notes %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>{{ note.title }}</strong> 
+                <div>
+                    <a href="{% url 'edit_notes' note.id %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_notes' note.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p class="text-muted">No notes uploaded yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

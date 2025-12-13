@@ -1,0 +1,61 @@
+{% extends 'layout/layout.html' %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-2xl font-bold mb-4 text-center">Subjects for {{ semester }}</h1>
+
+    {% if user.user_type == "student" %}
+        <form method="post" action="{% url 'view_notes' %}" class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
+            {% csrf_token %}
+            <label for="subject" class="block font-semibold mb-2">Select Subject:</label>
+            <select name="subject" id="subject" class="w-full border rounded-lg p-2 mb-4">
+                {% for subject in subjects %}
+                    {% if subject.semester.id == semester.id and subject.branch.id == user.student.branch.id and subject.semester.batch.id == user.student.batch.id %}
+                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                    {% endif %}
+                {% empty %}
+                    <option disabled>No subjects available</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">View Notes</button>
+        </form>
+
+    {% elif user.user_type == "faculty" %}
+        <div class="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Filter Subjects</h2>
+            <form method="post" action="{% url 'faculty_view_subjects' %}">
+                {% csrf_token %}
+                <label for="batch" class="block font-semibold mb-2">Select Batch:</label>
+                <select name="batch" id="batch" class="w-full border rounded-lg p-2 mb-4">
+                    {% for batch in batches %}
+                        <option value="{{ batch.id }}">{{ batch.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="year" class="block font-semibold mb-2">Select Year:</label>
+                <select name="year" id="year" class="w-full border rounded-lg p-2 mb-4">
+                    {% for year in years %}
+                        <option value="{{ year.id }}">{{ year.year }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="semester" class="block font-semibold mb-2">Select Semester:</label>
+                <select name="semester" id="semester" class="w-full border rounded-lg p-2 mb-4">
+                    {% for semester in semesters %}
+                        <option value="{{ semester.id }}">{{ semester.year }} - Semester {{ semester.sem_number }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">View Subjects</button>
+            </form>
+        </div>
+    {% endif %}
+    
+    <div class="text-center mt-6">
+        <a href="{% url 'dashboard' %}" class="text-white bg-blue-500 hover:bg-blue-600 font-bold py-2 px-4 rounded">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+

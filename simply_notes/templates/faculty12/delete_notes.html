@@ -1,0 +1,22 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}Delete Note{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center text-danger mb-4">Delete Note</h1>
+    <div class="card shadow-lg p-4">
+        {% if note %}
+            <p>Are you sure you want to delete the note titled <strong>"{{ note.title }}"</strong>?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a href="{% url 'faculty_dashboard' %}" class="btn btn-secondary ml-2">Cancel</a>
+            </form>
+        {% else %}
+            <p class="text-danger"> Note not found!</p>
+            <a href="{% url 'faculty_dashboard' %}" class="btn btn-primary">Go Back</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
