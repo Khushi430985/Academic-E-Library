@@ -392,20 +392,10 @@ from django.http import HttpResponse
 
 def create_admin(request):
     User = get_user_model()
-
-    user, created = User.objects.get_or_create(
-        email="admin@gmail.com",
-        defaults={
-            "first_name": "Admin",
-            "last_name": "User",
-            "is_staff": True,
-            "is_superuser": True,
-        }
-    )
-
-    user.set_password("admin123")
-    user.is_staff = True
-    user.is_superuser = True
-    user.save()
-
-    return HttpResponse("Admin reset successfully")
+    if not User.objects.filter(email="admin@gmail.com").exists():
+        User.objects.create_superuser(
+            email="admin@gmail.com",
+            password="admin123"
+        )
+        return HttpResponse("Admin created successfully")
+    return HttpResponse("Admin already exists")
