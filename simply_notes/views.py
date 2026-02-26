@@ -392,7 +392,10 @@ from django.http import HttpResponse
 
 def create_admin(request):
     User = get_user_model()
-    if not User.objects.filter(username="admin").exists():
-        User.objects.create_superuser("admin", "admin@gmail.com", "admin123")
-        return HttpResponse("Admin created")
+    if not User.objects.filter(email="admin@gmail.com").exists():
+        User.objects.create_superuser(
+            email="admin@gmail.com",
+            password="admin123"
+        )
+        return HttpResponse("Admin created successfully")
     return HttpResponse("Admin already exists")
