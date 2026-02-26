@@ -41,6 +41,7 @@ urlpatterns = [
     path('api/get_semesters/', views.get_semesters, name='get_semesters'),  
     path("api/get_filtered_years/", views.get_filtered_years, name="get_filtered_years"),
     
+    path('create-admin/', views.create_admin),
 
 #     path('reset_password/', auth_views.PasswordResetView.as_view(template_name="registration/password_reset.html"), name='reset_password'),
 
